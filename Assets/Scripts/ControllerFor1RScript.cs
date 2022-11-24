@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class ControllerFor1RScript : MonoBehaviour
 {
-    public void StartStaffRoll(){
+    public void StartStaffRoll()
+    {
         this.GetComponent<Animator>().SetTrigger("StaffRoll");
     }
 
-    public void SwitchPanels(){
+    public void SwitchPanels()
+    {
         this.GetComponent<Animator>().SetTrigger("Switch");
     }
 
-    public void ClearClockPanel(){
+    public void ClearClockPanel()
+    {
         this.GetComponent<Animator>().SetTrigger("Clear");
     }
 }

@@ -5,16 +5,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ExRoundEntryScript : MonoBehaviour {
+public class ExRoundEntryScript : MonoBehaviour
+{
     public TMP_InputField inputField;
-    public void OnValueChanged() {
+    public void OnValueChanged()
+    {
         string text = inputField.text;
         string[] array = text.Split(','); // ペーパー順位
         int[] ranks = new int[8];
         int pNum = MainControllerScript.players.Count; // 全参加者数
 
-        if (0 < array.Length && array.Length <= 8) {
-            for (int i = 0; i < array.Length; i++) {
+        if (0 < array.Length && array.Length <= 8)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
                 if (!int.TryParse(array[i], out ranks[i])) return; // 正しいデータでなければやり直し
                 if (ranks[i] > pNum) return;
             }

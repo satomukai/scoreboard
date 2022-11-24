@@ -7,7 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ControllerForExR1Script : MonoBehaviour {
+public class ControllerForExR1Script : MonoBehaviour
+{
     public GameObject questionIndex;
     public GameObject question;
     public GameObject answer;
@@ -20,29 +21,40 @@ public class ControllerForExR1Script : MonoBehaviour {
 
     public TMP_InputField inputField;
 
-    void Start() {
-        using (StreamReader sr = new StreamReader("./Assets/Data/ExtraQuestions.csv")) {
+    void Start()
+    {
+        using (StreamReader sr = new StreamReader("./Assets/Data/ExtraQuestions.csv"))
+        {
             string line;
             string[] values;
 
-            while (!sr.EndOfStream) {
+            while (!sr.EndOfStream)
+            {
                 line = sr.ReadLine();
                 values = line.Split(',');
                 extraQuestions.Add(new Question(values[1], values[2]));
-                if (values.Length == 3) {
+                if (values.Length == 3)
+                {
                     subAnswers.Add("");
-                } else if (values.Length == 4) {
+                }
+                else if (values.Length == 4)
+                {
                     subAnswers.Add(values[3]);
-                } else {
+                }
+                else
+                {
                     subAnswers.Add(values[3] + "\n" + values[4]);
                 }
             }
         }
     }
-    public void NextIsClicked() {
+    public void NextIsClicked()
+    {
 
-        if (sceneCounter < 30) {
-            switch (sceneCounter % 3) {
+        if (sceneCounter < 30)
+        {
+            switch (sceneCounter % 3)
+            {
                 case 0:
                     questionIndex.GetComponent<TextMeshProUGUI>().text = "第" + (sceneCounter / 3 + 1).ToString() + "問";
                     questionIndex.GetComponent<Animator>().SetTrigger("Trigger");
@@ -56,8 +68,11 @@ public class ControllerForExR1Script : MonoBehaviour {
                     question.GetComponent<Animator>().SetTrigger("Trigger");
                     break;
             }
-        } else if (sceneCounter < 50) {
-            switch (sceneCounter % 2) {
+        }
+        else if (sceneCounter < 50)
+        {
+            switch (sceneCounter % 2)
+            {
                 case 0:
                     answer.GetComponent<TextMeshProUGUI>().text = extraQuestions[(sceneCounter - 30) / 2].answer;
                     subAnswer.GetComponent<TextMeshProUGUI>().text = subAnswers[(sceneCounter - 30) / 2];
@@ -69,8 +84,11 @@ public class ControllerForExR1Script : MonoBehaviour {
                     subAnswer.GetComponent<Animator>().SetTrigger("Trigger");
                     break;
             }
-        } else if (sceneCounter < 75) {
-            switch (sceneCounter % 5) {
+        }
+        else if (sceneCounter < 75)
+        {
+            switch (sceneCounter % 5)
+            {
                 case 0:
                     questionIndex.GetComponent<TextMeshProUGUI>().text = "第" + (sceneCounter / 5 + 1).ToString() + "問";
                     questionIndex.GetComponent<Animator>().SetTrigger("Trigger");
@@ -97,25 +115,30 @@ public class ControllerForExR1Script : MonoBehaviour {
         }
         sceneCounter++;
     }
-    public void OnValueChanged() {
+    public void OnValueChanged()
+    {
         string[] array = inputField.text.Split(','); // ペーパー順位
         int[] ranks = new int[8];
         int pNum = MainControllerScript.players.Count; // 全参加者数
         List<Player> p; // 参加プレイヤーのリスト
 
         p = MainControllerScript.players.FindAll(obj => obj.entry["Ex2"] == "Entry");
-        if (0 < array.Length && array.Length <= 8 && p.Count == 40) {
-            for (int i = 0; i < array.Length; i++) {
+        if (0 < array.Length && array.Length <= 8 && p.Count == 40)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
                 if (!int.TryParse(array[i], out ranks[i])) return; // 正しいデータでなければやり直し
                 if (ranks[i] > pNum) return;
             }
-            for (int i = 0; i < array.Length; i++) {
+            for (int i = 0; i < array.Length; i++)
+            {
                 MainControllerScript.players[ranks[i] - 1].result["Ex1"] = 1;
                 MainControllerScript.players[ranks[i] - 1].entry["Ex2"] = "Entry"; // playersはペーパー順位で並んでいる
                 p.Add(MainControllerScript.players[ranks[i] - 1]);
             }
             p = p.OrderBy(a => Guid.NewGuid()).ToList();
-            for (int i = 0; i < p.Count; i++) {
+            for (int i = 0; i < p.Count; i++)
+            {
                 p[i].entry["Ex2"] = "Group" + (i % 6 + 1).ToString();
             }
             inputField.text = "";
