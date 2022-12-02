@@ -25,9 +25,13 @@ public class ControllerFor3RScript : GameControllerScript
         }
 
         // ルール特有のオブジェクトの設定
-        scoreBoardAnimators = new Animator[pNum];
-        for (int i = 0; i < pNum; i++)
-            scoreBoardAnimators[i] = scoreBoards[i].GetComponent<Animator>();
+        if (rule.Item1 == "10HitsComboV")
+        {
+            scoreBoardAnimators = new Animator[pNum];
+            for (int i = 0; i < pNum; i++)
+                scoreBoardAnimators[i] = scoreBoards[i].GetComponent<Animator>();
+        }
+
 
         // ゲーム管理クラスのインスタンスを生成
         if (rule.Item1 == "10up-down")
@@ -86,12 +90,13 @@ public class ControllerFor3RScript : GameControllerScript
     public override void updateDisplay()
     {
         // 変えないといけないのは正解数, 誤答数の表示&色と, バーと背景パネルの色
-        TextMeshProUGUI mainTMP, subTMP;
+        TextMeshProUGUI mainTMP, subTMP, comboTMP;
         Renderer barRenderer, backPanelRenderer;
         for (int i = 0; i < pNum; i++)
         {
             mainTMP = scoreBoards[i].transform.Find("Canvas/Main").gameObject.GetComponent<TextMeshProUGUI>();
             subTMP = scoreBoards[i].transform.Find("Canvas/Sub").gameObject.GetComponent<TextMeshProUGUI>();
+            comboTMP = scoreBoards[i].transform.Find("Canvas/Combo").gameObject.GetComponent<TextMeshProUGUI>();
             barRenderer = scoreBoards[i].transform.Find("bar").gameObject.GetComponent<Renderer>();
             backPanelRenderer = namePlates[i].transform.Find("BackPanel").gameObject.GetComponent<Renderer>();
 
@@ -131,7 +136,15 @@ public class ControllerFor3RScript : GameControllerScript
             else if (rule.Item1 == "10divide10")
                 subTMP.text = game.scores[i].wrongNum.ToString() + "×";
             else if (rule.Item1 == "10HitsComboV")
+            {
                 subTMP.text = game.scores[i].wrongNum.ToString() + "×";
+                if (game.scores[i].winFlag > 0 || game.scores[i].loseFlag)
+                    scoreBoards[i].transform.Find("Canvas/Combo").gameObject.SetActive(false);
+                else
+                    scoreBoards[i].transform.Find("Canvas/Combo").gameObject.SetActive(true);
+                comboTMP.text = Convert.ToString(game.scores[i].consecutiveAnswersNum);
+                comboTMP.color = MainControllerScript.white;
+            }
         }
         if (rule.Item1 == "Freeze10" || rule.Item1 == "10HitsComboV")
         {
@@ -155,16 +168,17 @@ public class ControllerFor3RScript : GameControllerScript
     void Update()
     {
         // 連答状態によってアニメーションを変える
-        if (rule.Item1 == "10HitsComboV" && consecutiveAnswerAnimatorFlag)
+        if (rule.Item1 == "10HitsComboV" && animationFlag)
         {
             for (int i = 0; i < pNum; i++)
             {
+
                 if (game.scores[i].consecutiveAnswersNum > 0 && game.scores[i].winFlag == 0)
                     scoreBoardAnimators[i].SetBool("Flag", true);
                 else
                     scoreBoardAnimators[i].SetBool("Flag", false);
             }
-            consecutiveAnswerAnimatorFlag = false;
+            animationFlag = false;
         }
     }
 

@@ -8,6 +8,7 @@ using TMPro;
 public class ControllerForExR3Script : GameControllerScript
 {
     private int group; // 何組目か
+    private Animator[] scoreBoardAnimators; // ScoreBoardsのAnimatorを管理
     void Start()
     {
         base.Initialize("Ex3", "Entry");
@@ -18,6 +19,11 @@ public class ControllerForExR3Script : GameControllerScript
             namePlates[i].transform.position += new Vector3((float)(-0.55 * (pNum - 1)) + (float)(1.1 * i), -0.4f, 0f);
             scoreBoards[i].transform.position += new Vector3((float)(-0.55 * (pNum - 1)) + (float)(1.1 * i), -3f, 0f);
         }
+
+        // ルール特有のオブジェクトの設定
+        scoreBoardAnimators = new Animator[pNum];
+        for (int i = 0; i < pNum; i++)
+            scoreBoardAnimators[i] = scoreBoards[i].GetComponent<Animator>();
 
         // ゲーム管理クラスのインスタンスを生成
         game = new PassGate(pNum: pNum, winLimit: 1); // 連答付き5o2x(12->5)
@@ -79,7 +85,21 @@ public class ControllerForExR3Script : GameControllerScript
         }
     }
 
-    void Update() { }
+    void Update()
+    {
+        // 連答状態によってアニメーションを変える
+        if (animationFlag)
+        {
+            for (int i = 0; i < pNum; i++)
+            {
+                if (game.scores[i].point == 2 && game.scores[i].winFlag == 0 && !game.scores[i].loseFlag)
+                    scoreBoardAnimators[i].SetBool("Flag", true);
+                else
+                    scoreBoardAnimators[i].SetBool("Flag", false);
+            }
+            animationFlag = false;
+        }
+    }
 }
 
 

@@ -19,7 +19,7 @@ public abstract class GameControllerScript : MonoBehaviour
     protected bool updateFlag = true; // Trueのときだけ値が更新できる
     protected int backFlag = 0; // 直前の操作が巻き戻しだったからどうか 問題パネルを余計に回転させないために使う
     protected bool skipFlag = false; // 問題を読まずターンを進めるか
-    protected bool consecutiveAnswerAnimatorFlag = true; // Trueのときだけ連答エフェクトの状態をを更新できる
+    protected bool animationFlag = true; // Trueのときだけ連答エフェクトの状態をを更新できる
     protected int pNum = 12; // 1ルールの参加者数
     protected List<Player> p; // 参加プレイヤーのリスト
     protected GameObject[] namePlates;
@@ -122,7 +122,7 @@ public abstract class GameControllerScript : MonoBehaviour
             if (!updateFlag)
             {
                 updateDisplay();
-                consecutiveAnswerAnimatorFlag = true;
+                animationFlag = true;
             }
             if (game.timerStopFlag && timerPanel != null)
                 timerPanel.transform.Find("Canvas1/TimerText").gameObject.GetComponent<TimerScript>().StopTimer();
@@ -158,7 +158,7 @@ public abstract class GameControllerScript : MonoBehaviour
             game.Back(); // 巻き戻し処理を行う
             updateDisplay(); // 表示を更新
             backFlag++;
-            consecutiveAnswerAnimatorFlag = true;
+            animationFlag = true;
         }
     }
 
@@ -170,7 +170,7 @@ public abstract class GameControllerScript : MonoBehaviour
             game.End(); // 勝ち抜け者を決める
             updateDisplay(); // 表示を更新
             saveResult(); // 結果をプレイヤーリストに反映
-            consecutiveAnswerAnimatorFlag = true;
+            animationFlag = true;
             updateFlag = false;
         }
     }
@@ -220,14 +220,14 @@ public abstract class GameControllerScript : MonoBehaviour
     }
 
     // 誤答数を表示用の形式にして返す(ex. 3x失格のルールで誤答数2->"xx-")
-    protected string ToDisplayStyle(int wNum, int wLimit)
+    protected string ToDisplayStyle(int wNum, int wLimit, bool foldingFlag = true)
     {
         if (wLimit == -1)
             return "";
         else
         {
             string tmp = new string('×', wNum) + new string('・', wLimit - wNum);
-            if (wLimit > 5)
+            if (wLimit > 5 && foldingFlag)
                 return tmp.Insert(5, "\n");
             else
                 return tmp;

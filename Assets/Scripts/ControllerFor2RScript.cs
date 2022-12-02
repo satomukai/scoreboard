@@ -102,7 +102,7 @@ public class ControllerFor2RScript : GameControllerScript
     void Update()
     {
         // 連答状態によってアニメーションを変える
-        if (consecutiveAnswerAnimatorFlag)
+        if (animationFlag)
         {
             for (int i = 0; i < pNum; i++)
             {
@@ -111,7 +111,7 @@ public class ControllerFor2RScript : GameControllerScript
                 else
                     scoreBoardAnimators[i].SetBool("Flag", false);
             }
-            consecutiveAnswerAnimatorFlag = false;
+            animationFlag = false;
         }
     }
 

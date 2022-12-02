@@ -13,7 +13,7 @@ public class ControllerForFScript : GameControllerScript
 
     private bool timeOutFlag = true;
     private bool endFlag = false; // Endが押されるまでTimeOutを押せないように
-    private int selectedRule = -1; // 選択中のルールを0-6で(5o1x, 5o7x, 5o1休, 変則4o3x, 7ptアタサバ, 7o3x, 3Combo shot)
+    private int selectedRule = -1; // 選択中のルールを0-6で(5o1x, 5o7x, 5o5休, 変則4o3x, 7ptアタサバ, 7o3x, 3Combo shot)
     private int[] selectedRules = new int[7] { 0, 0, 0, 0, 0, 0, 0 }; // 選択中は1, 終了したら2
     private int[] gotSets = new int[3] { 0, 0, 0 }; // 獲得セット数
 
@@ -90,7 +90,6 @@ public class ControllerForFScript : GameControllerScript
                 break;
             case 4:
                 game = new AttackSurvival(pNum: pNum, winLimit: 1, hp: 7, minusByOthersCorrectAnswer: 1, minusByMyWrongAnswer: 2);
-                Debug.Log("ok");
                 questionPanel.transform.Find("Canvas/Rule").gameObject.GetComponent<TextMeshProUGUI>().text = "Final:  The Trinity - 7Point AS";
                 break;
             case 5:
@@ -105,6 +104,12 @@ public class ControllerForFScript : GameControllerScript
         game.InitialUpdate();
         game.makeHistory();
         updateDisplay(); // スコア表示を更新
+        for (int i = 0; i < pNum; i++)
+        {
+            scoreBoards[i].GetComponent<Animator>().SetBool("Flag", false);
+            scoreBoards[i].transform.Find("FreezePanel").gameObject.SetActive(false);
+        }
+
     }
 
     // タイムアウト中に次のルールに変える
@@ -115,7 +120,11 @@ public class ControllerForFScript : GameControllerScript
             if (endFlag)
             {
                 for (int i = 0; i < pNum; i++)
+                {
+                    scoreBoards[i].transform.Find("Canvas/Combo").gameObject.SetActive(false);
+                    scoreBoards[i].GetComponent<Animator>().SetBool("Flag", false);
                     scoreBoards[i].GetComponent<Animator>().SetTrigger("Trigger");
+                }
                 timeOutFlag = true;
             }
         }
@@ -166,12 +175,13 @@ public class ControllerForFScript : GameControllerScript
     public override void updateDisplay()
     {
         // 変えないといけないのは正解数, 誤答数の表示&色と, バーと背景パネルの色
-        TextMeshProUGUI mainTMP, subTMP;
+        TextMeshProUGUI mainTMP, subTMP, comboTMP;
         Renderer barRenderer;
         for (int i = 0; i < pNum; i++)
         {
             mainTMP = scoreBoards[i].transform.Find("Canvas/Main").gameObject.GetComponent<TextMeshProUGUI>();
             subTMP = scoreBoards[i].transform.Find("Canvas/Sub").gameObject.GetComponent<TextMeshProUGUI>();
+            comboTMP = scoreBoards[i].transform.Find("Canvas/Combo").gameObject.GetComponent<TextMeshProUGUI>();
             barRenderer = scoreBoards[i].transform.Find("bar").gameObject.GetComponent<Renderer>();
             if (game.scores[i].winFlag > 0)
             { // 勝ち抜け
@@ -200,7 +210,7 @@ public class ControllerForFScript : GameControllerScript
                     subTMP.text = ToDisplayStyle(game.scores[i].wrongNum, 1);
                     break;
                 case 1:
-                    subTMP.text = ToDisplayStyle(game.scores[i].wrongNum, 7);
+                    subTMP.text = ToDisplayStyle(game.scores[i].wrongNum, 7, foldingFlag: false);
                     break;
                 case 2:
                     subTMP.text = "";
@@ -216,6 +226,12 @@ public class ControllerForFScript : GameControllerScript
                     break;
                 case 6:
                     subTMP.text = ToDisplayStyle(game.scores[i].wrongNum, 3);
+                    if (game.scores[i].winFlag > 0 || game.scores[i].loseFlag)
+                        scoreBoards[i].transform.Find("Canvas/Combo").gameObject.SetActive(false);
+                    else
+                        scoreBoards[i].transform.Find("Canvas/Combo").gameObject.SetActive(true);
+                    comboTMP.text = Convert.ToString(game.scores[i].consecutiveAnswersNum);
+                    comboTMP.color = MainControllerScript.white;
                     break;
             }
             namePlates[i].transform.Find("Canvas/Stars").gameObject.GetComponent<TextMeshProUGUI>().text = new string('★', gotSets[i]) + new string('☆', 3 - gotSets[i]);
@@ -263,16 +279,16 @@ public class ControllerForFScript : GameControllerScript
     void Update()
     {
         // 連答状態によってアニメーションを変える
-        if (selectedRule != -1 && consecutiveAnswerAnimatorFlag)
+        if (selectedRule == 6 && animationFlag)
         {
             for (int i = 0; i < pNum; i++)
             {
-                if (game.scores[i].consecutiveAnswersNum > 0 && game.scores[i].winFlag == 0)
+                if (game.scores[i].consecutiveAnswersNum > 0 && game.scores[i].winFlag == 0 && !game.scores[i].loseFlag)
                     scoreBoards[i].GetComponent<Animator>().SetBool("Flag", true);
                 else
                     scoreBoards[i].GetComponent<Animator>().SetBool("Flag", false);
             }
-            consecutiveAnswerAnimatorFlag = false;
+            animationFlag = false;
         }
     }
 
