@@ -58,7 +58,7 @@ public abstract class GameControllerScript : MonoBehaviour
         // 問題パネルに問題を書き込む
         questionPanel.transform.Find("Canvas/Question").gameObject.GetComponent<TextMeshProUGUI>().text = MainControllerScript.questions[MainControllerScript.questionIndex].question;
         questionPanel.transform.Find("Canvas/Answer").gameObject.GetComponent<TextMeshProUGUI>().text = MainControllerScript.questions[MainControllerScript.questionIndex].answer;
-        questionCheck.GetComponent<TextMeshProUGUI>().text = "次の問題: " + MainControllerScript.questions[MainControllerScript.questionIndex].question.Substring(0, 10) + "...";
+        questionCheck.GetComponent<TextMeshProUGUI>().text = "次の問題: " + MainControllerScript.questions[MainControllerScript.questionIndex].question.Substring(0, System.Math.Min(10, MainControllerScript.questions[MainControllerScript.questionIndex].question.Length)) + "...";
     }
 
     // players.entryを見てセットの参加者を登録する 人が足りないときは適当に登録する(デバッグ用) 大会によって変える必要がある

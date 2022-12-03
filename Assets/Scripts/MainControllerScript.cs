@@ -121,6 +121,8 @@ public class MainControllerScript : MonoBehaviour
                 // 表示
                 for (int i = 0; i < players.Count; i++)
                     Debug.Log(players[i].entryNumber + ", " + players[i].paperRank + ", " + players[i].name);
+                for (int i = 0; i < questions.Count; i++)
+                    Debug.Log(questions[i].question + ", " + questions[i].answer);
             }
 
             inputFlag = true; // 入力は1度だけ
